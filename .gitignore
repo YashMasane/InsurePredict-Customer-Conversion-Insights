@@ -1,6 +1,7 @@
 # Byte-compiled / optimized / DLL files
 vehicle_env
 Notebooks/catboost_info
+hidden.txt
 __pycache__/
 *.py[cod]
 *$py.class
@@ -171,3 +172,4 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+Notebooks/credentials.txt
