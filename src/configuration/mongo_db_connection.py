@@ -2,6 +2,8 @@ import os
 import sys
 import pymongo
 import certifi
+from dotenv import load_dotenv
+load_dotenv()
 
 from src.exception import MyException
 from src.logger import logging
