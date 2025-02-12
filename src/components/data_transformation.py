@@ -1,7 +1,6 @@
 import sys
 import numpy as np
 import pandas as pd
-from imblearn.combine import SMOTEENN
 from imblearn.under_sampling import RepeatedEditedNearestNeighbours
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
