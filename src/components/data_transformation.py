@@ -71,12 +71,6 @@ class DataTransformation:
             logging.exception("Exception occurred in get_data_transformer_object method of DataTransformation class")
             raise MyException(e, sys) from e
 
-    # def _map_gender_column(self, df):
-    #     """Map Gender column to 0 for Female and 1 for Male."""
-    #     logging.info("Mapping 'Gender' column to binary values")
-    #     df['Gender'] = df['Gender'].map({'Female': 0, 'Male': 1}).astype(int)
-    #     return df
-
     def _capping_outliers(self, df: pd.DataFrame):
         """Removing outliers from annual premium column by applying capping."""
         logging.info("Removed outliers from annual premium column by capping.")
