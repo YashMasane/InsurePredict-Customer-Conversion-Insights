@@ -92,10 +92,7 @@ class ModelEvaluation:
             x = self._create_dummy_columns(x)
 
             # trained_model = load_object(file_path=self.model_trainer_artifact.trained_model_file_path)
-            preprocessor_obj = load_object(file_path=self.data_transformation_artifact.transformed_object_file_path)
-
-            x = preprocessor_obj.transform(x)
-
+ 
             logging.info("Trained model loaded/exists.")
             trained_model_f1_score = self.model_trainer_artifact.metric_artifact.f1_score
             logging.info(f"F1_Score for this model: {trained_model_f1_score}")
