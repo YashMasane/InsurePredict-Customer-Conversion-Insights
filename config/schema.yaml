@@ -43,3 +43,9 @@ mm_columns:
   - Age
   - Vintage
   - Vehicle_Age
+
+ohe_columns:
+  - Region_Code
+  - Policy_Sales_Channel
+  - Vehicle_Damage
+  - Gender
