@@ -34,6 +34,7 @@ DATA_INGESTION_DIR_NAME: str = "data_ingestion"
 DATA_INGESTION_FEATURE_STORE_DIR: str = "feature_store"
 DATA_INGESTION_INGESTED_DIR: str = "ingested"
 DATA_INGESTION_TRAIN_TEST_SPLIT_RATIO: float = 0.25
+DATA_INGESTION_RANDOM_STATE = 42
 
 """
 Data Validation realted contant start with DATA_VALIDATION VAR NAME
@@ -62,7 +63,7 @@ MODEL_REPORT_FILE_NAME: str = "model_report.yaml"
 MODEL Evaluation related constants
 """
 MODEL_EVALUATION_CHANGED_THRESHOLD_SCORE: float = 0.02
-MODEL_BUCKET_NAME = "my-model-mlopsproj"
+MODEL_BUCKET_NAME = "my-model-insurepredict"
 MODEL_PUSHER_S3_KEY = "model-registry"
 
 

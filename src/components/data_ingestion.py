@@ -3,6 +3,7 @@ import sys
 
 from pandas import DataFrame
 from sklearn.model_selection import train_test_split
+from src.constants import DATA_INGESTION_RANDOM_STATE
 
 from src.entity.config_entity import DataIngestionConfig
 from src.entity.artifact_entity import DataIngestionArtifact
@@ -56,7 +57,8 @@ class DataIngestion:
         logging.info("Entered split_data_as_train_test method of Data_Ingestion class")
 
         try:
-            train_set, test_set = train_test_split(dataframe, test_size=self.data_ingestion_config.train_test_split_ratio)
+            train_set, test_set = train_test_split(dataframe, test_size=self.data_ingestion_config.train_test_split_ratio,
+                                                   random_state=DATA_INGESTION_RANDOM_STATE)
             logging.info("Performed train test split on the dataframe")
             logging.info(
                 "Exited split_data_as_train_test method of Data_Ingestion class"

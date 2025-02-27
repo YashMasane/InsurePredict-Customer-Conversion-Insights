@@ -2,9 +2,9 @@ from src.entity.config_entity import ModelEvaluationConfig
 from src.entity.artifact_entity import ModelTrainerArtifact, DataIngestionArtifact, ModelEvaluationArtifact, DataTransformationArtifact
 from sklearn.metrics import f1_score
 from src.exception import MyException
-from src.constants import TARGET_COLUMN
+from src.constants import TARGET_COLUMN, SCHEMA_FILE_PATH
 from src.logger import logging
-from src.utils.main_utils import load_object
+from src.utils.main_utils import read_yaml_file
 import sys
 import pandas as pd
 from typing import Optional
@@ -22,12 +22,12 @@ class EvaluateModelResponse:
 class ModelEvaluation:
 
     def __init__(self, model_eval_config: ModelEvaluationConfig, data_ingestion_artifact: DataIngestionArtifact,
-                 model_trainer_artifact: ModelTrainerArtifact, data_transformation_artifact: DataTransformationArtifact):
+                 model_trainer_artifact: ModelTrainerArtifact):
         try:
             self.model_eval_config = model_eval_config
             self.data_ingestion_artifact = data_ingestion_artifact
             self.model_trainer_artifact = model_trainer_artifact
-            self.data_transformation_artifact = data_transformation_artifact
+            self._schema_config = read_yaml_file(file_path=SCHEMA_FILE_PATH)
         except Exception as e:
             raise MyException(e, sys) from e
 
@@ -90,8 +90,6 @@ class ModelEvaluation:
             x = self._drop_unnecessary_columns(x)
             x = self._map_columns(x)
             x = self._create_dummy_columns(x)
-
-            # trained_model = load_object(file_path=self.model_trainer_artifact.trained_model_file_path)
  
             logging.info("Trained model loaded/exists.")
             trained_model_f1_score = self.model_trainer_artifact.metric_artifact.f1_score

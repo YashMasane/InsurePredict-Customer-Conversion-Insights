@@ -3,10 +3,11 @@ import numpy as np
 import pandas as pd
 from imblearn.under_sampling import RepeatedEditedNearestNeighbours
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler, MinMaxScaler
+from sklearn.preprocessing import  MinMaxScaler
+from sklearn.preprocessing import OneHotEncoder
 from sklearn.compose import ColumnTransformer
 
-from src.constants import TARGET_COLUMN, SCHEMA_FILE_PATH, CURRENT_YEAR
+from src.constants import TARGET_COLUMN, SCHEMA_FILE_PATH
 from src.entity.config_entity import DataTransformationConfig
 from src.entity.artifact_entity import DataTransformationArtifact, DataIngestionArtifact, DataValidationArtifact
 from src.exception import MyException
@@ -43,22 +44,22 @@ class DataTransformation:
 
         try:
             # Initialize transformers
-            # numeric_transformer = StandardScaler()
+            one_hot_encoder = OneHotEncoder(sparse_output=False, handle_unknown='ignore')
             min_max_scaler = MinMaxScaler()
             logging.info("Transformers Initialized: MinMaxScaler")
 
             # # Load schema configurations
-            # num_features = self._schema_config['num_features']
             mm_columns = self._schema_config['mm_columns']
+            ohe_columns = self._schema_config['ohe_columns']
             logging.info("Cols loaded from schema.")
 
             # Creating preprocessor pipeline
             preprocessor = ColumnTransformer(
                 transformers=[
-                    # ("StandardScaler", numeric_transformer, num_features),
+                    ("OneHotEncoder", one_hot_encoder, ohe_columns),
                     ("MinMaxScaler", min_max_scaler, mm_columns)
                 ],
-                remainder='passthrough'  # Leaves other columns as they are
+                remainder='passthrough'  
             )
 
             # Wrapping everything in a single pipeline
@@ -82,14 +83,6 @@ class DataTransformation:
         logging.info("Mapping Vehicle_Age columns and casting to int")
         df['Vehicle_Age'] = df['Vehicle_Age'].map({'< 1 Year':0, '1-2 Year':1, '> 2 Years':2}).astype(int)
         return df
-
-
-    def _create_dummy_columns(self, df: pd.DataFrame):
-        """Create dummy variables for categorical features."""
-        logging.info("Creating dummy variables for categorical features")
-        df = pd.get_dummies(df, drop_first=True)
-        return df
-
     
     def _drop_unnecessary_columns(self, df: pd.DataFrame):
         """Drop the unnecessary columns if it exists."""
@@ -124,12 +117,10 @@ class DataTransformation:
             # Apply custom transformations in specified sequence
             input_feature_train_df = self._drop_unnecessary_columns(input_feature_train_df)
             input_feature_train_df = self._map_columns(input_feature_train_df)
-            input_feature_train_df = self._create_dummy_columns(input_feature_train_df)
             input_feature_train_df = self._capping_outliers(input_feature_train_df)
 
             input_feature_test_df = self._drop_unnecessary_columns(input_feature_test_df)
             input_feature_test_df = self._map_columns(input_feature_test_df)
-            input_feature_test_df = self._create_dummy_columns(input_feature_test_df)
             
             logging.info("Custom transformations applied to train and test data")
 

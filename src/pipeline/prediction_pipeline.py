@@ -18,7 +18,7 @@ class VehicleData:
                 Vintage,
                 Vehicle_Age,
                 # Vehicle_Age_gt_2_Years,
-                Vehicle_Damage_Yes
+                Vehicle_Damage
                 ):
         """
         Vehicle Data constructor
@@ -35,7 +35,7 @@ class VehicleData:
             self.Vintage = Vintage
             self.Vehicle_Age = Vehicle_Age
             # self.Vehicle_Age_gt_2_Years = Vehicle_Age_gt_2_Years
-            self.Vehicle_Damage_Yes = Vehicle_Damage_Yes
+            self.Vehicle_Damage = Vehicle_Damage
 
         except Exception as e:
             raise MyException(e, sys) from e
@@ -71,7 +71,7 @@ class VehicleData:
                 "Vintage": [self.Vintage],
                 "Vehicle_Age": [self.Vehicle_Age],
                 # "Vehicle_Age_gt_2_Years": [self.Vehicle_Age_gt_2_Years],
-                "Vehicle_Damage_Yes": [self.Vehicle_Damage_Yes]
+                "Vehicle_Damage": [self.Vehicle_Damage]
             }
 
             logging.info("Created vehicle data dict")
