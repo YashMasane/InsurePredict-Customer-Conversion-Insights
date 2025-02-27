@@ -4,7 +4,6 @@ from fastapi.responses import Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import numpy as np
-from starlette.responses import HTMLResponse, RedirectResponse
 from uvicorn import run as app_run
 
 from typing import Optional
@@ -44,15 +43,13 @@ class DataForm:
         self.request: Request = request
         self.Gender: Optional[int] = None
         self.Age: Optional[int] = None
-        # self.Driving_License: Optional[int] = None
         self.Region_Code: Optional[str] = None
         self.Previously_Insured: Optional[int] = None
         self.Annual_Premium: Optional[float] = None
         self.Policy_Sales_Channel: Optional[str] = None
         self.Vintage: Optional[int] = None
-        # self.Vehicle_Age_lt_1_Year: Optional[int] = None
         self.Vehicle_Age: Optional[int] = None
-        self.Vehicle_Damage_Yes: Optional[int] = None
+        self.Vehicle_Damage: Optional[int] = None
                 
 
     async def get_vehicle_data(self):
@@ -62,36 +59,19 @@ class DataForm:
         """
         form = await self.request.form()
         self.Gender = form.get("Gender")
-        self.Age = form.get("Age")
-        self.Driving_License = form.get("Driving_License")
+        self.Age = int(form.get("Age"))
         self.Region_Code = form.get("Region_Code")
-        self.Previously_Insured = form.get("Previously_Insured")
-        self.Annual_Premium = form.get("Annual_Premium")
+        self.Previously_Insured = int(form.get("Previously_Insured"))
+        self.Annual_Premium = float(form.get("Annual_Premium"))
         self.Policy_Sales_Channel = form.get("Policy_Sales_Channel")
-        self.Vintage = form.get("Vintage")
-        self.Vehicle_Age = form.get("Vehicle_Age")
-        # self.Vehicle_Age_gt_2_Years = form.get("Vehicle_Age_gt_2_Years")
-        self.Vehicle_Damage_Yes = form.get("Vehicle_Damage_Yes")
+        self.Vintage = float(form.get("Vintage"))
+        self.Vehicle_Age = float(form.get("Vehicle_Age"))
+        self.Vehicle_Damage_Yes = form.get("Vehicle_Damage")
 
-    def encode_categorical(self):
+    def map_columns(self):
         """
         Apply one-hot encoding to categorical fields: 'Region_Code', 'Vehicle_Age' and 'Policy_Sales_Channel'.
         """
-        region_categories = ['28.0', '3.0', '11.0', '41.0', '33.0', '6.0', '35.0', '50.0',
-                             '15.0', '1.0', '8.0', '36.0', '30.0', '47.0', '29.0', '46.0']
-        
-        sales_categories = ['26.0', '152.0', '160.0', '124.0', '1.0', '13.0', '30.0', '156.0',
-                            '163.0', '157.0', '122.0', '154.0', '151.0', '25.0', '7.0', '8.0']
-
-        # One-hot encoding for Region_Code
-        region_ohe = np.zeros(len(region_categories))
-        if self.Region_Code in region_categories:
-            region_ohe[self.Region_Code] = 1
-
-        # One-hot encoding for Policy_Sales_Channel
-        sales_ohe = np.zeros(len(sales_categories))
-        if self.Policy_Sales_Channel in sales_categories:
-            sales_ohe[self.Policy_Sales_Channel] = 1
         
         if self.Vehicle_Age <= 1:
             self.Vehicle_Age = 0
@@ -100,7 +80,7 @@ class DataForm:
         else:
             self.Vehicle_Age = 2
 
-        return region_ohe.tolist(), sales_ohe.tolist()
+        return self.Vehicle_Age
 
 
 # Route to render the main page with the form
@@ -136,18 +116,18 @@ async def predictRouteClient(request: Request):
         form = DataForm(request)
         await form.get_vehicle_data()
         
+        vehicle_age = form.map_columns()
+
         vehicle_data = VehicleData(
                                 Gender= form.Gender,
                                 Age = form.Age,
-                                Driving_License = form.Driving_License,
                                 Region_Code = form.Region_Code,
                                 Previously_Insured = form.Previously_Insured,
                                 Annual_Premium = form.Annual_Premium,
                                 Policy_Sales_Channel = form.Policy_Sales_Channel,
                                 Vintage = form.Vintage,
-                                Vehicle_Age_lt_1_Year = form.Vehicle_Age_lt_1_Year,
-                                Vehicle_Age_gt_2_Years = form.Vehicle_Age_gt_2_Years,
-                                Vehicle_Damage_Yes = form.Vehicle_Damage_Yes
+                                Vehicle_Age = vehicle_age,
+                                Vehicle_Damage = form.Vehicle_Damage
                                 )
 
         # Convert form data into a DataFrame for the model
@@ -160,7 +140,7 @@ async def predictRouteClient(request: Request):
         value = model_predictor.predict(dataframe=vehicle_df)[0]
 
         # Interpret the prediction result as 'Response-Yes' or 'Response-No'
-        status = "Response-Yes" if value == 1 else "Response-No"
+        status = "Customer will buy Insurance" if value == 1 else "Customer won\'t buy Insurance"
 
         # Render the same HTML page with the prediction result
         return templates.TemplateResponse(
