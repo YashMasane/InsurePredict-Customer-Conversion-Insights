@@ -3,105 +3,266 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Owner avatar
-        InsurePredict
-        </title>
+    <title>InsurePredict - Intelligent Insurance Conversion Platform</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Owner avatar
-            InsurePredict</h1>
-        <h3>Customer-Conversion-Insights</h3>
-            
-
-        <form method="post" action="/">
-            <label for="Gender">Gender:</label>
-            <select id="Gender" name="Gender" required>
-                <option value="1">Male</option>
-                <option value="0">Female</option>
-            </select>
-
-            <label for="Age">Age:</label>
-            <input type="number" id="Age" name="Age" min="18" max="100" required>
-
-            <label for="Region_Code">Region Code:</label>
-            <select id="Region_Code" name="Region_Code" required>
-                <option value="">Select Region</option>
-                <option value="28.0">28.0</option>
-                <option value="3.0">3.0</option>
-                <option value="11.0">11.0</option>
-                <option value="41.0">41.0</option>
-                <option value="33.0">33.0</option>
-                <option value="6.0">6.0</option>
-                <option value="35.0">35.0</option>
-                <option value="50.0">50.0</option>
-                <option value="15.0">15.0</option>
-                <option value="1.0">1.0</option>
-                <option value="8.0">8.0</option>
-                <option value="36.0">36.0</option>
-                <option value="30.0">30.0</option>
-                <option value="47.0">47.0</option>
-                <option value="29.0">29.0</option>
-                <option value="46.0">46.0</option>
-                <!-- Add more regions dynamically -->
-            </select>
-
-            <label for="Previously_Insured">Previously Insured:</label>
-            <select id="Previously_Insured" name="Previously_Insured" required>
-                <option value="0">No</option>
-                <option value="1">Yes</option>
-            </select>
-
-            <label for="Annual_Premium">Annual Premium:</label>
-            <input type="number" step="0.01" id="Annual_Premium" name="Annual_Premium" required>
-
-            <label for="Policy_Sales_Channel">Policy Sales Channel:</label>
-            <select id="Policy_Sales_Channel" name="Policy_Sales_Channel" required>
-                <option value="">Select Channel</option>
-                <option value="26.0">26.0</option>
-                <option value="152.0">152.0</option>
-                <option value="160.0">160.0</option>
-                <option value="124.0">124.0</option>
-                <option value="1.0">1.0</option>
-                <option value="13.0">13.0</option>
-                <option value="30.0">30.0</option>
-                <option value="156.0">156.0</option>
-                <option value="163.0">163.0</option>
-                <option value="157.0">157.0</option>
-                <option value="122.0">122.0</option>
-                <option value="154.0">154.0</option>
-                <option value="151.0">151.0</option>
-                <option value="25.0">25.0</option>
-                <option value="7.0">7.0</option>
-                <option value="8.0">8.0</option>
-                <!-- Add more channels dynamically -->
-            </select>
-
-            <label for="Vintage">Vintage:</label>
-            <input type="number" id="Vintage" name="Vintage" required>
-
-            <label for="Vehicle_Age">Vehicle Age (Years):</label>
-            <input type="number" id="Vehicle_Age" name="Vehicle_Age" min="0" max="10" required>
-
-            <label for="Vehicle_Damage">Vehicle Damage:</label>
-            <select id="Vehicle_Damage" name="Vehicle_Damage" required>
-                <option value="0">No</option>
-                <option value="1">Yes</option>
-            </select>
-
-            <button type="submit">Predict</button>
-        </form>
-
-        <form method="get" action="/train">
-            <button type="submit" class="train-button">Train Model</button>
-        </form>
-
-        {% if context %}
-            <div class="result">
-                <h2>Result: {{ context }}</h2>
+    <header class="main-header">
+        <div class="container">
+            <div class="logo-container">
+                <div class="logo">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>InsurePredict</h1>
+                    <p>Intelligent Insurance Insights</p>
+                </div>
             </div>
-        {% endif %}
-    </div>
+            <nav>
+                <ul>
+                    <li><a href="#" class="active">Home</a></li>
+                    <li><a href="#">Dashboard</a></li>
+                    <li><a href="#">Analytics</a></li>
+                    <li><a href="#">About</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h2>Predict Customer Conversion with AI</h2>
+                <p>Our advanced machine learning algorithms help insurance companies identify potential customers with high conversion probability.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="main-content">
+        <div class="container">
+            <div class="card prediction-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-chart-line"></i> Conversion Prediction</h3>
+                    <p>Fill in the customer details to predict insurance conversion probability</p>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="/" class="prediction-form">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="Gender">Gender</label>
+                                <select id="Gender" name="Gender" required>
+                                    <option value="1">Male</option>
+                                    <option value="0">Female</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="Age">Age</label>
+                                <input type="number" id="Age" name="Age" min="18" max="100" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="Previously_Insured">Previously Insured</label>
+                                <select id="Previously_Insured" name="Previously_Insured" required>
+                                    <option value="0">No</option>
+                                    <option value="1">Yes</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="Annual_Premium">Annual Premium</label>
+                                <div class="input-with-icon">
+                                    <i class="fas fa-dollar-sign"></i>
+                                    <input type="number" step="0.01" id="Annual_Premium" name="Annual_Premium" required>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="Vehicle_Age">Vehicle Age (Years)</label>
+                                <input type="number" id="Vehicle_Age" name="Vehicle_Age" min="0" max="10" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="Vehicle_Damage">Vehicle Damage</label>
+                                <select id="Vehicle_Damage" name="Vehicle_Damage" required>
+                                    <option value="0">No</option>
+                                    <option value="1">Yes</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="Region_Code">Region Code</label>
+                                <select id="Region_Code" name="Region_Code" required>
+                                    <option value="">Select Region</option>
+                                    <option value="28.0">28.0</option>
+                                    <option value="3.0">3.0</option>
+                                    <option value="11.0">11.0</option>
+                                    <option value="41.0">41.0</option>
+                                    <option value="33.0">33.0</option>
+                                    <option value="6.0">6.0</option>
+                                    <option value="35.0">35.0</option>
+                                    <option value="50.0">50.0</option>
+                                    <option value="15.0">15.0</option>
+                                    <option value="1.0">1.0</option>
+                                    <option value="8.0">8.0</option>
+                                    <option value="36.0">36.0</option>
+                                    <option value="30.0">30.0</option>
+                                    <option value="47.0">47.0</option>
+                                    <option value="29.0">29.0</option>
+                                    <option value="46.0">46.0</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="Policy_Sales_Channel">Policy Sales Channel</label>
+                                <select id="Policy_Sales_Channel" name="Policy_Sales_Channel" required>
+                                    <option value="">Select Channel</option>
+                                    <option value="26.0">26.0</option>
+                                    <option value="152.0">152.0</option>
+                                    <option value="160.0">160.0</option>
+                                    <option value="124.0">124.0</option>
+                                    <option value="1.0">1.0</option>
+                                    <option value="13.0">13.0</option>
+                                    <option value="30.0">30.0</option>
+                                    <option value="156.0">156.0</option>
+                                    <option value="163.0">163.0</option>
+                                    <option value="157.0">157.0</option>
+                                    <option value="122.0">122.0</option>
+                                    <option value="154.0">154.0</option>
+                                    <option value="151.0">151.0</option>
+                                    <option value="25.0">25.0</option>
+                                    <option value="7.0">7.0</option>
+                                    <option value="8.0">8.0</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="Vintage">Vintage (Days)</label>
+                                <div class="input-with-icon">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    <input type="number" id="Vintage" name="Vintage" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-magic"></i> Predict Conversion
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                {% if context is not none and context != "" %}
+                <div class="result-section">
+                    <div class="result-card 
+                        {% if context == 'Customer will buy Insurance' %} 
+                            positive 
+                        {% elif context == 'Customer won\'t buy Insurance' %}
+                            negative 
+                        {% endif %}">
+                        <div class="result-icon">
+                            <i class="{% if context == 'Customer will buy Insurance' %} fas fa-check-circle 
+                                    {% elif context == 'Customer won\'t buy Insurance' %} fas fa-times-circle {% endif %}">
+                            </i>
+                        </div>
+                        <div class="result-content">
+                            <h3>Prediction Result</h3>
+                            <p>{{ context }}</p>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            </div>
+
+            <div class="admin-actions">
+                <form method="get" action="/train">
+                    <button type="submit" class="btn btn-secondary">
+                        <i class="fas fa-cogs"></i> Train Model
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <section class="features">
+        <div class="container">
+            <h2>Why Choose InsurePredict?</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3>Advanced ML Algorithms</h3>
+                    <p>Our prediction engine uses state-of-the-art machine learning models to deliver accurate results.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-pie"></i>
+                    </div>
+                    <h3>Data-Driven Insights</h3>
+                    <p>Make informed decisions based on comprehensive customer behavior analysis.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-tachometer-alt"></i>
+                    </div>
+                    <h3>Real-Time Processing</h3>
+                    <p>Get instant predictions to streamline your sales process and increase efficiency.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-column">
+                    <h4>InsurePredict</h4>
+                    <p>Intelligent conversion prediction platform powered by advanced machine learning algorithms.</p>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Services</a></li>
+                        <li><a href="#">Pricing</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="#">Documentation</a></li>
+                        <li><a href="#">API Reference</a></li>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Case Studies</a></li>
+                        <li><a href="#">Knowledge Base</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>Contact Us</h4>
+                    <address>
+                        <p><i class="fas fa-map-marker-alt"></i> 123 Enterprise Blvd, Suite 200</p>
+                        <p><i class="fas fa-phone"></i> (555) 123-4567</p>
+                        <p><i class="fas fa-envelope"></i> info@insurepredict.com</p>
+                    </address>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 InsurePredict. All rights reserved.</p>
+                <div class="footer-links">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                </div>
+            </div>
+        </div>
+    </footer>
 </body>
 </html>
