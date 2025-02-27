@@ -49,3 +49,6 @@ ohe_columns:
   - Policy_Sales_Channel
   - Vehicle_Damage
   - Gender
+
+ord_column:
+  - Vehicle_Age
