@@ -41,7 +41,7 @@ class DataForm:
     """
     def __init__(self, request: Request):
         self.request: Request = request
-        self.Gender: Optional[int] = None
+        self.Gender: Optional[str] = None
         self.Age: Optional[int] = None
         self.Region_Code: Optional[str] = None
         self.Previously_Insured: Optional[int] = None
@@ -49,7 +49,7 @@ class DataForm:
         self.Policy_Sales_Channel: Optional[str] = None
         self.Vintage: Optional[int] = None
         self.Vehicle_Age: Optional[int] = None
-        self.Vehicle_Damage: Optional[int] = None
+        self.Vehicle_Damage: Optional[str] = None
                 
 
     async def get_vehicle_data(self):
@@ -66,16 +66,16 @@ class DataForm:
         self.Policy_Sales_Channel = form.get("Policy_Sales_Channel")
         self.Vintage = float(form.get("Vintage"))
         self.Vehicle_Age = float(form.get("Vehicle_Age"))
-        self.Vehicle_Damage_Yes = form.get("Vehicle_Damage")
+        self.Vehicle_Damage = form.get("Vehicle_Damage")
 
     def map_columns(self):
         """
         Apply one-hot encoding to categorical fields: 'Region_Code', 'Vehicle_Age' and 'Policy_Sales_Channel'.
         """
         
-        if self.Vehicle_Age <= 1:
+        if self.Vehicle_Age < 1:
             self.Vehicle_Age = 0
-        elif self.Vehicle_Age > 1 and self.Vehicle_Age <= 2:
+        elif self.Vehicle_Age >= 1 and self.Vehicle_Age <= 2:
             self.Vehicle_Age = 1
         else:
             self.Vehicle_Age = 2
@@ -132,21 +132,24 @@ async def predictRouteClient(request: Request):
 
         # Convert form data into a DataFrame for the model
         vehicle_df = vehicle_data.get_vehicle_input_data_frame()
+        print(vehicle_df.head())
 
         # Initialize the prediction pipeline
         model_predictor = VehicleDataClassifier()
 
         # Make a prediction and retrieve the result
         value = model_predictor.predict(dataframe=vehicle_df)[0]
+        print(value)
 
         # Interpret the prediction result as 'Response-Yes' or 'Response-No'
-        status = "Customer will buy Insurance" if value == 1 else "Customer won\'t buy Insurance"
+        status = "Customer will buy Insurance" if value == 1.0 else "Customer won\'t buy Insurance"
 
         # Render the same HTML page with the prediction result
         return templates.TemplateResponse(
             "vehicledata.html",
             {"request": request, "context": status},
         )
+        
         
     except Exception as e:
         return {"status": False, "error": f"{e}"}
