@@ -22,6 +22,10 @@ class Proj1Estimator:
 
 
     def is_model_present(self,model_path):
+        """
+        Checking if model is present or not
+        :param model_paht: path where model is saved
+        """
         try:
             return self.s3.s3_key_path_available(bucket_name=self.bucket_name, s3_key=model_path)
         except MyException as e:
