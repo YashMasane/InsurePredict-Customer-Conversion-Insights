@@ -76,6 +76,7 @@ class VehicleData:
 
             logging.info("Created vehicle data dict")
             logging.info("Exited get_vehicle_data_as_dict method as VehicleData class")
+            print(input_data)
             return input_data
 
         except Exception as e:
