@@ -9,6 +9,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Remove any existing repo before checkout
+        run: rm -rf * || true  # This ensures a clean slate
+
       - name: Checkout
         uses: actions/checkout@v2
 
