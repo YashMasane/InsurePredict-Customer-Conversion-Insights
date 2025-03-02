@@ -150,7 +150,6 @@ async def predictRouteClient(request: Request):
         
     except Exception as e:
         return {"status": False, "error": f"{e}"}
-    
 
 # Main entry point to start the FastAPI server
 if __name__ == "__main__":
