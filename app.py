@@ -3,7 +3,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-import numpy as np
 from uvicorn import run as app_run
 
 from typing import Optional
@@ -132,14 +131,12 @@ async def predictRouteClient(request: Request):
 
         # Convert form data into a DataFrame for the model
         vehicle_df = vehicle_data.get_vehicle_input_data_frame()
-        print(vehicle_df.head())
 
         # Initialize the prediction pipeline
         model_predictor = VehicleDataClassifier()
 
         # Make a prediction and retrieve the result
         value = model_predictor.predict(dataframe=vehicle_df)[0]
-        print(value)
 
         # Interpret the prediction result as 'Response-Yes' or 'Response-No'
         status = "Customer will buy Insurance" if value == 1.0 else "Customer won\'t buy Insurance"
@@ -153,6 +150,7 @@ async def predictRouteClient(request: Request):
         
     except Exception as e:
         return {"status": False, "error": f"{e}"}
+    
 
 # Main entry point to start the FastAPI server
 if __name__ == "__main__":
