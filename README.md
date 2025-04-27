@@ -1,6 +1,4 @@
 # InsurePredict: Customer Conversion Insight 🚗📊
-
-![Project Logo](https://via.placeholder.com/150x50.png?text=InsurePredict) 
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen) 
 ![Python Version](https://img.shields.io/badge/python-3.10-blue) 
 ![License](https://img.shields.io/badge/license-MIT-orange)
