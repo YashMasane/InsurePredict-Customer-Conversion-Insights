@@ -1,0 +1,126 @@
+schema: '2.0'
+stages:
+  data_ingestion:
+    cmd: python src/components/data_ingestion.py
+    deps:
+    - path: src/components/data_ingestion.py
+      hash: md5
+      md5: 61005e5cd43e25d328ff1b97dc2f361b
+      size: 5165
+    - path: src/entity/config_entity.py
+      hash: md5
+      md5: a72ac1151f28902eb0116ab151265cb8
+      size: 3261
+    - path: src/pipeline/train_pipeline_stage.py
+      hash: md5
+      md5: e126cedf1eaeeb43b6758c20fd08504e
+      size: 1316
+    outs:
+    - path: artifact/data_ingestion/feature_store/data.csv
+      hash: md5
+      md5: 1d43a9962a16f1d852bcb5eddcf1b423
+      size: 28673184
+    - path: artifact/data_ingestion/ingested/test.csv
+      hash: md5
+      md5: b122b2f714221aa758250b0217b7c910
+      size: 7168167
+    - path: artifact/data_ingestion/ingested/train.csv
+      hash: md5
+      md5: db7cb3875f3edf5427eaa146e3769c39
+      size: 21505160
+  data_validation:
+    cmd: python src/components/data_validation.py
+    deps:
+    - path: artifact/data_ingestion/ingested/test.csv
+      hash: md5
+      md5: b122b2f714221aa758250b0217b7c910
+      size: 7168167
+    - path: artifact/data_ingestion/ingested/train.csv
+      hash: md5
+      md5: db7cb3875f3edf5427eaa146e3769c39
+      size: 21505160
+    - path: src/components/data_validation.py
+      hash: md5
+      md5: 4844ed29770838c80f2864e4fdbae38c
+      size: 7613
+    - path: src/entity/config_entity.py
+      hash: md5
+      md5: a72ac1151f28902eb0116ab151265cb8
+      size: 3261
+    - path: src/pipeline/train_pipeline_stage.py
+      hash: md5
+      md5: e126cedf1eaeeb43b6758c20fd08504e
+      size: 1316
+    outs:
+    - path: artifact/data_validation/validation_report.yaml
+      hash: md5
+      md5: 4ffbbec3da2537825b4652518849394e
+      size: 55
+  data_transformation:
+    cmd: python src/components/data_transformation.py
+    deps:
+    - path: artifact/data_ingestion/ingested/test.csv
+      hash: md5
+      md5: b122b2f714221aa758250b0217b7c910
+      size: 7168167
+    - path: artifact/data_ingestion/ingested/train.csv
+      hash: md5
+      md5: db7cb3875f3edf5427eaa146e3769c39
+      size: 21505160
+    - path: artifact/data_validation/validation_report.yaml
+      hash: md5
+      md5: 4ffbbec3da2537825b4652518849394e
+      size: 55
+    - path: src/components/data_transformation.py
+      hash: md5
+      md5: 54e0ff86a54e71c6f8550fbf78dbc298
+      size: 9872
+    - path: src/pipeline/train_pipeline_stage.py
+      hash: md5
+      md5: e126cedf1eaeeb43b6758c20fd08504e
+      size: 1316
+    outs:
+    - path: artifact/data_transformation/transformed/test.npy
+      hash: md5
+      md5: 3778b631e3915b6102e195cd660e46bc
+      size: 22038032
+    - path: artifact/data_transformation/transformed/train.npy
+      hash: md5
+      md5: 06f2caa135993888d2ef536ec96273fb
+      size: 66183056
+    - path: artifact/data_transformation/transformed_object/preprocessing.pkl
+      hash: md5
+      md5: 1123c5e726447985d8fdd4d771396622
+      size: 3026
+  model_trainer:
+    cmd: python src/components/model_trainer.py
+    deps:
+    - path: artifact/data_transformation/transformed/test.npy
+      hash: md5
+      md5: 3778b631e3915b6102e195cd660e46bc
+      size: 22038032
+    - path: artifact/data_transformation/transformed/train.npy
+      hash: md5
+      md5: 06f2caa135993888d2ef536ec96273fb
+      size: 66183056
+    - path: artifact/data_transformation/transformed_object/preprocessing.pkl
+      hash: md5
+      md5: 1123c5e726447985d8fdd4d771396622
+      size: 3026
+    - path: src/components/model_trainer.py
+      hash: md5
+      md5: 85a59547ee90450a01a5d04f5faa2978
+      size: 8533
+    - path: src/pipeline/train_pipeline_stage.py
+      hash: md5
+      md5: e126cedf1eaeeb43b6758c20fd08504e
+      size: 1316
+    outs:
+    - path: artifact/model_trainer/model_report.yaml
+      hash: md5
+      md5: 5bbf59a4b6216304a1a40497ec09bc2b
+      size: 150
+    - path: artifact/model_trainer/trained_model/model.pkl
+      hash: md5
+      md5: f1a969dc0b4c65ccff8083f628fb3f86
+      size: 909807
