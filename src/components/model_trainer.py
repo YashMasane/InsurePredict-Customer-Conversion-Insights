@@ -1,24 +1,23 @@
+from src.constants import MODEL_TRAINER_MODEL_CONFIG_FILE_PATH
+from src.entity.estimator import MyModel
+from src.entity.artifact_entity import DataTransformationArtifact, ModelTrainerArtifact, ClassificationMetricArtifact
+from src.entity.config_entity import ModelTrainerConfig
+from src.utils.main_utils import load_numpy_array_data, load_object, save_object, read_yaml_file
+from src.logger import logging
+from src.exception import MyException
+from mlflow.models.signature import infer_signature
+import mlflow.sklearn
+import mlflow
+from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
+from sklearn.ensemble import GradientBoostingClassifier
+import numpy as np
 import sys
 from typing import Tuple
 import os
 import json
 from datetime import datetime
-
-import numpy as np
-from sklearn.ensemble import GradientBoostingClassifier
-from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
-
-import mlflow
-import mlflow.sklearn
-from mlflow.models.signature import infer_signature
-
-from src.exception import MyException
-from src.logger import logging
-from src.utils.main_utils import load_numpy_array_data, load_object, save_object, read_yaml_file
-from src.entity.config_entity import ModelTrainerConfig
-from src.entity.artifact_entity import DataTransformationArtifact, ModelTrainerArtifact, ClassificationMetricArtifact
-from src.entity.estimator import MyModel
-from src.constants import MODEL_TRAINER_MODEL_CONFIG_FILE_PATH
+from dotenv import load_dotenv
+load_dotenv()
 
 
 class ModelTrainer:
@@ -138,6 +137,10 @@ class ModelTrainer:
                 preprocessing_object=preprocessing_obj, trained_model_object=trained_model)
             save_object(
                 self.model_trainer_config.trained_model_file_path, my_model)
+            save_object(
+                'model/model.pkl', my_model
+            )
+
             logging.info(
                 "Saved final model object that includes both preprocessing and the trained model")
 
@@ -165,3 +168,28 @@ class ModelTrainer:
 
         except Exception as e:
             raise MyException(e, sys) from e
+
+
+if __name__ == "__main__":
+    try:
+        # Create required artifacts
+        data_transformation_artifact = DataTransformationArtifact(
+            transformed_object_file_path="artifact/data_transformation/transformed_object/preprocessing.pkl",
+            transformed_train_file_path="artifact/data_transformation/transformed/train.npy",
+            transformed_test_file_path="artifact/data_transformation/transformed/test.npy"
+        )
+
+        model_trainer_config = ModelTrainerConfig()
+
+        # Initialize model trainer
+        model_trainer = ModelTrainer(
+            data_transformation_artifact=data_transformation_artifact,
+            model_trainer_config=model_trainer_config
+        )
+
+        # Train model and get artifacts
+        model_trainer_artifact = model_trainer.initiate_model_trainer()
+
+    except Exception as e:
+        print(f"Error occurred: {str(e)}")
+        raise MyException(e, sys)

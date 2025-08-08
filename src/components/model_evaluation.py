@@ -11,6 +11,7 @@ from typing import Optional
 from src.entity.s3_estimator import Proj1Estimator
 from dataclasses import dataclass
 
+
 @dataclass
 class EvaluateModelResponse:
     trained_model_f1_score: float
@@ -35,26 +36,27 @@ class ModelEvaluation:
         """
         Method Name :   get_best_model
         Description :   This function is used to get model from production stage.
-        
+
         Output      :   Returns model object if available in s3 storage
         On Failure  :   Write an exception log and then raise an exception
         """
         try:
             bucket_name = self.model_eval_config.bucket_name
-            model_path=self.model_eval_config.s3_model_key_path
+            model_path = self.model_eval_config.s3_model_key_path
             proj1_estimator = Proj1Estimator(bucket_name=bucket_name,
-                                               model_path=model_path)
+                                             model_path=model_path)
 
             if proj1_estimator.is_model_present(model_path=model_path):
                 return proj1_estimator
             return None
         except Exception as e:
-            raise  MyException(e,sys)
-        
+            raise MyException(e, sys)
+
     def _map_columns(self, df: pd.DataFrame):
         """Map Vehicle_Age columns to 0, 1 and 2 according to their age."""
         logging.info("Mapping Vehicle_Age columns and casting to int")
-        df['Vehicle_Age'] = df['Vehicle_Age'].map({'< 1 Year':0, '1-2 Year':1, '> 2 Years':2}).astype(int)
+        df['Vehicle_Age'] = df['Vehicle_Age'].map(
+            {'< 1 Year': 0, '1-2 Year': 1, '> 2 Years': 2}).astype(int)
         return df
 
     def _create_dummy_columns(self, df: pd.DataFrame):
@@ -77,7 +79,7 @@ class ModelEvaluation:
         Method Name :   evaluate_model
         Description :   This function is used to evaluate trained model 
                         with production model and choose best model 
-        
+
         Output      :   Returns bool value based on validation results
         On Failure  :   Write an exception log and then raise an exception
         """
@@ -85,17 +87,18 @@ class ModelEvaluation:
             test_df = pd.read_csv(self.data_ingestion_artifact.test_file_path)
             x, y = test_df.drop(TARGET_COLUMN, axis=1), test_df[TARGET_COLUMN]
 
-            logging.info("Test data loaded and now transforming it for prediction...")
+            logging.info(
+                "Test data loaded and now transforming it for prediction...")
 
             x = self._drop_unnecessary_columns(x)
             x = self._map_columns(x)
             # x = self._create_dummy_columns(x)
- 
+
             logging.info("Trained model loaded/exists.")
             trained_model_f1_score = self.model_trainer_artifact.metric_artifact.f1_score
             logging.info(f"F1_Score for this model: {trained_model_f1_score}")
 
-            best_model_f1_score=None
+            best_model_f1_score = None
             best_model = self.get_best_model()
             if best_model is not None:
                 logging.info(f"Computing F1_Score for production model..")
@@ -103,8 +106,9 @@ class ModelEvaluation:
                 with open('predictions.txt', 'w') as preds:
                     preds.write('\n'.join(map(str, y_hat_best_model)))
                 best_model_f1_score = f1_score(y, y_hat_best_model)
-                logging.info(f"F1_Score-Production Model: {best_model_f1_score}, F1_Score-New Trained Model: {trained_model_f1_score}")
-            
+                logging.info(
+                    f"F1_Score-Production Model: {best_model_f1_score}, F1_Score-New Trained Model: {trained_model_f1_score}")
+
             tmp_best_model_score = 0 if best_model_f1_score is None else best_model_f1_score
             result = EvaluateModelResponse(trained_model_f1_score=trained_model_f1_score,
                                            best_model_f1_score=best_model_f1_score,
@@ -121,10 +125,10 @@ class ModelEvaluation:
         """
         Method Name :   initiate_model_evaluation
         Description :   This function is used to initiate all steps of the model evaluation
-        
+
         Output      :   Returns model evaluation artifact
         On Failure  :   Write an exception log and then raise an exception
-        """  
+        """
         try:
             print("------------------------------------------------------------------------------------------------")
             logging.info("Initialized Model Evaluation Component.")
@@ -137,7 +141,41 @@ class ModelEvaluation:
                 trained_model_path=self.model_trainer_artifact.trained_model_file_path,
                 changed_accuracy=evaluate_model_response.difference)
 
-            logging.info(f"Model evaluation artifact: {model_evaluation_artifact}")
+            logging.info(
+                f"Model evaluation artifact: {model_evaluation_artifact}")
             return model_evaluation_artifact
         except Exception as e:
             raise MyException(e, sys) from e
+
+
+if __name__ == "__main__":
+    try:
+        # Create required artifacts
+        data_ingestion_artifact = DataIngestionArtifact(
+            trained_file_path="artifact/data_ingestion/ingested/train.csv",
+            test_file_path="artifact/data_ingestion/ingested/test.csv"
+        )
+
+        model_trainer_artifact = ModelTrainerArtifact(
+            trained_model_file_path="artifact/model_trainer/trained_model/model.pkl",
+            metric_artifact=None  # Will be set during actual training
+        )
+
+        model_eval_config = ModelEvaluationConfig(
+            bucket_name="insurance-model-bucket",
+            s3_model_key_path="production_model/model.pkl"
+        )
+
+        # Initialize model evaluation
+        model_evaluation = ModelEvaluation(
+            model_eval_config=model_eval_config,
+            data_ingestion_artifact=data_ingestion_artifact,
+            model_trainer_artifact=model_trainer_artifact
+        )
+
+        # Perform model evaluation
+        model_eval_artifact = model_evaluation.initiate_model_evaluation()
+
+    except Exception as e:
+        print(f"Error occurred: {str(e)}")
+        raise MyException(e, sys)
