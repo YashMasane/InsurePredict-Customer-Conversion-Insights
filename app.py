@@ -3,6 +3,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from fastapi import UploadFile, File
+import shutil
+import os
+from fastapi.responses import FileResponse
 from uvicorn import run as app_run
 
 from typing import Optional
@@ -33,11 +37,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 class DataForm:
     """
     DataForm class to handle and process incoming form data.
     This class defines the vehicle-related attributes expected from the form.
     """
+
     def __init__(self, request: Request):
         self.request: Request = request
         self.Gender: Optional[str] = None
@@ -49,7 +55,6 @@ class DataForm:
         self.Vintage: Optional[int] = None
         self.Vehicle_Age: Optional[int] = None
         self.Vehicle_Damage: Optional[str] = None
-                
 
     async def get_vehicle_data(self):
         """
@@ -71,7 +76,7 @@ class DataForm:
         """
         Apply one-hot encoding to categorical fields: 'Region_Code', 'Vehicle_Age' and 'Policy_Sales_Channel'.
         """
-        
+
         if self.Vehicle_Age < 1:
             self.Vehicle_Age = 0
         elif self.Vehicle_Age >= 1 and self.Vehicle_Age <= 2:
@@ -89,9 +94,11 @@ async def index(request: Request):
     Renders the main HTML form page for vehicle data input.
     """
     return templates.TemplateResponse(
-            "vehicledata.html",{"request": request, "context": "Rendering"})
+        "vehicledata.html", {"request": request, "context": "Rendering"})
 
 # Route to trigger the model training process
+
+
 @app.get("/train")
 async def trainRouteClient():
     """
@@ -106,6 +113,8 @@ async def trainRouteClient():
         return Response(f"Error Occurred! {e}")
 
 # Route to handle form submission and make predictions
+
+
 @app.post("/")
 async def predictRouteClient(request: Request):
     """
@@ -114,20 +123,20 @@ async def predictRouteClient(request: Request):
     try:
         form = DataForm(request)
         await form.get_vehicle_data()
-        
+
         vehicle_age = form.map_columns()
 
         vehicle_data = VehicleData(
-                                Gender= form.Gender,
-                                Age = form.Age,
-                                Region_Code = form.Region_Code,
-                                Previously_Insured = form.Previously_Insured,
-                                Annual_Premium = form.Annual_Premium,
-                                Policy_Sales_Channel = form.Policy_Sales_Channel,
-                                Vintage = form.Vintage,
-                                Vehicle_Age = vehicle_age,
-                                Vehicle_Damage = form.Vehicle_Damage
-                                )
+            Gender=form.Gender,
+            Age=form.Age,
+            Region_Code=form.Region_Code,
+            Previously_Insured=form.Previously_Insured,
+            Annual_Premium=form.Annual_Premium,
+            Policy_Sales_Channel=form.Policy_Sales_Channel,
+            Vintage=form.Vintage,
+            Vehicle_Age=vehicle_age,
+            Vehicle_Damage=form.Vehicle_Damage
+        )
 
         # Convert form data into a DataFrame for the model
         vehicle_df = vehicle_data.get_vehicle_input_data_frame()
@@ -146,10 +155,44 @@ async def predictRouteClient(request: Request):
             "vehicledata.html",
             {"request": request, "context": status},
         )
-        
-        
+
     except Exception as e:
         return {"status": False, "error": f"{e}"}
+
+
+@app.post("/batch_predict")
+async def batch_predict_route(file: UploadFile = File(...)):
+    """
+    Accepts a CSV file, runs batch prediction, and returns updated CSV.
+    """
+    try:
+        # Validate file extension
+        if not file.filename.endswith(".csv"):
+            return {"status": False, "error": "Only CSV files are allowed."}
+
+        # Save uploaded file temporarily
+        temp_input_path = f"temp_{file.filename}"
+        with open(temp_input_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+
+        # Run batch prediction
+        model_predictor = VehicleDataClassifier()
+        output_path = model_predictor.batch_predict(temp_input_path)
+
+        # Return file for download
+        return FileResponse(
+            path=output_path,
+            filename=os.path.basename(output_path),
+            media_type="text/csv"
+        )
+
+    except Exception as e:
+        return {"status": False, "error": f"{e}"}
+
+    finally:
+        # Clean up input file
+        if os.path.exists(temp_input_path):
+            os.remove(temp_input_path)
 
 
 # Main entry point to start the FastAPI server
