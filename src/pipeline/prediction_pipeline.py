@@ -1,4 +1,6 @@
 import sys
+import pandas as pd
+import time
 from src.entity.config_entity import VehiclePredictorConfig
 from src.entity.s3_estimator import Proj1Estimator
 from src.exception import MyException
@@ -8,18 +10,18 @@ from pandas import DataFrame
 
 class VehicleData:
     def __init__(self,
-                Gender,
-                Age,
-                # Driving_License,
-                Region_Code,
-                Previously_Insured,
-                Annual_Premium,
-                Policy_Sales_Channel,
-                Vintage,
-                Vehicle_Age,
-                # Vehicle_Age_gt_2_Years,
-                Vehicle_Damage
-                ):
+                 Gender,
+                 Age,
+                 # Driving_License,
+                 Region_Code,
+                 Previously_Insured,
+                 Annual_Premium,
+                 Policy_Sales_Channel,
+                 Vintage,
+                 Vehicle_Age,
+                 # Vehicle_Age_gt_2_Years,
+                 Vehicle_Damage
+                 ):
         """
         Vehicle Data constructor
         Input: all features of the trained model for prediction
@@ -40,24 +42,24 @@ class VehicleData:
         except Exception as e:
             raise MyException(e, sys) from e
 
-    def get_vehicle_input_data_frame(self)-> DataFrame:
+    def get_vehicle_input_data_frame(self) -> DataFrame:
         """
         This function returns a DataFrame from USvisaData class input
         """
         try:
-            
+
             vehicle_input_dict = self.get_vehicle_data_as_dict()
             return DataFrame(vehicle_input_dict)
-        
+
         except Exception as e:
             raise MyException(e, sys) from e
-
 
     def get_vehicle_data_as_dict(self):
         """
         This function returns a dictionary from VehicleData class input
         """
-        logging.info("Entered get_usvisa_data_as_dict method as VehicleData class")
+        logging.info(
+            "Entered get_usvisa_data_as_dict method as VehicleData class")
 
         try:
             input_data = {
@@ -75,15 +77,17 @@ class VehicleData:
             }
 
             logging.info("Created vehicle data dict")
-            logging.info("Exited get_vehicle_data_as_dict method as VehicleData class")
+            logging.info(
+                "Exited get_vehicle_data_as_dict method as VehicleData class")
             print(input_data)
             return input_data
 
         except Exception as e:
             raise MyException(e, sys) from e
 
+
 class VehicleDataClassifier:
-    def __init__(self,prediction_pipeline_config: VehiclePredictorConfig = VehiclePredictorConfig(),) -> None:
+    def __init__(self, prediction_pipeline_config: VehiclePredictorConfig = VehiclePredictorConfig(),) -> None:
         """
         :param prediction_pipeline_config: Configuration for prediction the value
         """
@@ -98,14 +102,69 @@ class VehicleDataClassifier:
         Returns: Prediction in string format
         """
         try:
-            logging.info("Entered predict method of VehicleDataClassifier class")
+            logging.info(
+                "Entered predict method of VehicleDataClassifier class")
             model = Proj1Estimator(
                 bucket_name=self.prediction_pipeline_config.model_bucket_name,
                 model_path=self.prediction_pipeline_config.model_file_path,
             )
-            result =  model.predict(dataframe)
-            
-            return result
-        
+
+            start = time.time()
+            result = model.predict(dataframe)
+            end = time.time()
+
+            total_time = end - start
+            query_per_sec = len(dataframe) / \
+                total_time if total_time > 0 else float('inf')
+
+            logging.info(
+                f"Prediction latency: {total_time:.4f} sec fo{len(dataframe)} rows")
+            logging.info(f"Predictions/sec: {query_per_sec:.2f}")
+
+            return result, total_time, query_per_sec
+
         except Exception as e:
+            raise MyException(e, sys)
+
+    def batch_predict(self, file_path: str) -> str:
+        """
+        Batch prediction from CSV file
+        Returns: Updated excel file with all predictions
+        """
+        try:
+            logging.info(f"Starting batch prediction on file: {file_path}")
+
+            # Read CSV
+            df = pd.read_csv(file_path)
+
+            # Validate required columns
+            required_columns = [
+                "Gender", "Age", "Region_Code", "Previously_Insured",
+                "Annual_Premium", "Policy_Sales_Channel", "Vintage",
+                "Vehicle_Age", "Vehicle_Damage"
+            ]
+
+            missing_cols = [
+                col for col in required_columns if col not in df.columns]
+            if missing_cols:
+                raise ValueError(f"Missing required columns: {missing_cols}")
+
+            # Make predictions
+            predictions, latency, rate = self.model.predict(df)
+
+            print(f"Latency: {latency:.4f} sec for {len(df)} rows")
+            print(f"Throughput: {rate:.2f} predictions/sec")
+
+            # Add predictions to dataframe
+            df['predicted_response'] = predictions
+
+            # Save results
+            output_path = file_path.replace('.csv', '_predictions.csv')
+            df.to_csv(output_path, index=False)
+
+            logging.info(f"Batch predictions saved to: {output_path}")
+            return output_path
+
+        except Exception as e:
+            logging.error(f"Error in batch prediction: {str(e)}")
             raise MyException(e, sys)
