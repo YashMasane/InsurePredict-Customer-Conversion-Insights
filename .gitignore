@@ -1,5 +1,7 @@
 # Byte-compiled / optimized / DLL files
 vehicle_env
+.venv
+.env
 artifact
 Notebooks/catboost_info
 hidden.txt
