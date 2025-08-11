@@ -556,3 +556,16 @@ address p i {
         width: 100%;
     }
 }
+
+.form-group input[type="file"] {
+    padding: 10px;
+    font-size: 14px;
+}
+#batchOutput {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--light-gray);
+    max-height: 300px;
+    overflow-y: auto;
+}
