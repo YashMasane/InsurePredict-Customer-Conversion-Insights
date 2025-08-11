@@ -18,7 +18,11 @@ fastapi
 python-multipart
 uvicorn
 jinja2
-imblearn
+imbalanced-learn
 xgboost
 catboost
+mlflow == 2.22.0
+dagshub
+dvc
+pytest
 -e .
