@@ -1,5 +1,6 @@
 # Byte-compiled / optimized / DLL files
 vehicle_env
+batch_test.csv
 .venv
 .env
 artifact
