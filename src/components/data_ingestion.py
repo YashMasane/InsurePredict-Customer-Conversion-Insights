@@ -42,8 +42,7 @@ class DataIngestion:
             logging.info(
                 f"Saving exported data into feature store file path: {feature_store_file_path}")
             dataframe.to_csv(feature_store_file_path, index=False, header=True)
-            os.makedirs('data/raw', exist_ok=True)
-            dataframe.to_csv('data/raw/data.csv', index=False, header=True)
+
             return dataframe
 
         except Exception as e:
@@ -115,6 +114,6 @@ class DataIngestion:
 
 
 if __name__ == "__main__":
-    
+
     data_ingestion = DataIngestion(data_ingestion_config=DataIngestionConfig)
     data_ingestion_artifact = data_ingestion.initiate_data_ingestion()

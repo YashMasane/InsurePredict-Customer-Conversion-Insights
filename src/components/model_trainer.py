@@ -137,9 +137,6 @@ class ModelTrainer:
                 preprocessing_object=preprocessing_obj, trained_model_object=trained_model)
             save_object(
                 self.model_trainer_config.trained_model_file_path, my_model)
-            save_object(
-                'model/model.pkl', my_model
-            )
 
             logging.info(
                 "Saved final model object that includes both preprocessing and the trained model")
