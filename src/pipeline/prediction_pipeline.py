@@ -1,10 +1,12 @@
 import sys
+import os
 import pandas as pd
 import time
 from src.entity.config_entity import VehiclePredictorConfig
 from src.entity.s3_estimator import Proj1Estimator
 from src.exception import MyException
 from src.logger import logging
+from src.constants import PREDICTIONS_DIR
 from pandas import DataFrame
 
 
@@ -129,7 +131,7 @@ class VehicleDataClassifier:
     def batch_predict(self, file_path: str) -> str:
         """
         Batch prediction from CSV file
-        Returns: Updated excel file with all predictions
+        Returns: Path to the output CSV file with predictions
         """
         try:
             logging.info(f"Starting batch prediction on file: {file_path}")
@@ -149,21 +151,28 @@ class VehicleDataClassifier:
             if missing_cols:
                 raise ValueError(f"Missing required columns: {missing_cols}")
 
-            # Make predictions
-            predictions, latency, rate = self.model.predict(df)
+            # Make predictions using the predict method
+            predictions, latency, rate = self.predict(df)
 
-            print(f"Latency: {latency:.4f} sec for {len(df)} rows")
-            print(f"Throughput: {rate:.2f} predictions/sec")
+            logging.info(
+                f"Prediction latency: {latency:.4f} sec for {len(df)} rows")
+            logging.info(f"Throughput: {rate:.2f} predictions/sec")
 
             # Add predictions to dataframe
             df['predicted_response'] = predictions
 
             # Save results
-            output_path = file_path.replace('.csv', '_predictions.csv')
+            os.makedirs(PREDICTIONS_DIR, exist_ok=True)
+            output_filename = os.path.basename(
+                file_path).replace(".csv", "_predictions.csv")
+            output_path = os.path.join(PREDICTIONS_DIR, output_filename)
             df.to_csv(output_path, index=False)
 
+            # Return download URL, not local path
+            download_url = f"/download/{output_filename}"
+
             logging.info(f"Batch predictions saved to: {output_path}")
-            return output_path
+            return download_url, latency, rate
 
         except Exception as e:
             logging.error(f"Error in batch prediction: {str(e)}")
