@@ -1,0 +1,11 @@
+Gender,Age,Region_Code,Previously_Insured,Annual_Premium,Policy_Sales_Channel,Vintage,Vehicle_Age,Vehicle_Damage,predicted_response
+Male,35,2,0,3500.5,26,200,1,Yes,1.0
+Female,29,3,0,4200.0,124,150,2,No,0.0
+Male,45,5,1,2800.0,14,365,0,Yes,0.0
+Female,38,8,0,5100.5,26,220,1,Yes,1.0
+Male,50,15,0,6200.0,45,100,2,No,0.0
+Female,31,6,1,3000.0,152,180,0,Yes,0.0
+Male,27,4,0,4100.0,124,250,1,Yes,1.0
+Female,42,7,0,7000.0,26,300,2,No,0.0
+Male,36,3,1,2900.0,14,120,0,Yes,0.0
+Female,33,2,0,4800.5,45,210,1,Yes,1.0
