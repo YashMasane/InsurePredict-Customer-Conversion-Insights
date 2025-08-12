@@ -15,6 +15,7 @@ from typing import Optional
 from src.constants import APP_HOST, APP_PORT
 from src.pipeline.prediction_pipeline import VehicleData, VehicleDataClassifier
 from src.pipeline.training_pipeline import TrainPipeline
+from src.constants import PREDICTIONS_DIR
 
 # Initialize FastAPI application
 app = FastAPI()
@@ -177,14 +178,15 @@ async def batch_predict_route(file: UploadFile = File(...)):
 
         # Run batch prediction
         model_predictor = VehicleDataClassifier()
-        output_path = model_predictor.batch_predict(temp_input_path)
+        output_path, latency, throughput = model_predictor.batch_predict(
+            temp_input_path)
+        
 
-        # Return file for download
-        return FileResponse(
-            path=output_path,
-            filename=os.path.basename(output_path),
-            media_type="text/csv"
-        )
+        return {
+            "output_path": output_path,
+            "latency": round(latency,2),
+            "throughput": round(throughput, 2)
+        }
 
     except Exception as e:
         return {"status": False, "error": f"{e}"}
@@ -193,6 +195,15 @@ async def batch_predict_route(file: UploadFile = File(...)):
         # Clean up input file
         if os.path.exists(temp_input_path):
             os.remove(temp_input_path)
+
+os.makedirs(PREDICTIONS_DIR, exist_ok=True)
+
+@app.get("/download/{filename}")
+async def download_file(filename: str):
+    file_path = os.path.join(PREDICTIONS_DIR, filename)
+    if os.path.exists(file_path):
+        return FileResponse(file_path, filename=filename, media_type="text/csv")
+    return {"error": "File not found"}
 
 
 # Main entry point to start the FastAPI server
