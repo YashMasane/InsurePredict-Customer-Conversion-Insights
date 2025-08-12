@@ -175,7 +175,7 @@
             {% endif %}
             </div>
 
-                        <!-- Batch Prediction Card -->
+            <!-- Batch Prediction Card -->
             <div class="card prediction-card">
                 <div class="card-header">
                     <h3><i class="fas fa-file-upload"></i> Batch Prediction</h3>
@@ -195,7 +195,7 @@
                     </form>
                     <div id="batchResult" class="result-section" style="display:none;">
                         <h4>Batch Prediction Results</h4>
-                        <pre id="batchOutput"></pre>
+                        <div id="batchOutput"></div>
                     </div>
                 </div>
             </div>
@@ -306,7 +306,7 @@
         formData.append('file', fileInput.files[0]);
 
         try {
-            const response = await fetch('/predict-batch', {
+            const response = await fetch('/batch_predict', {
                 method: 'POST',
                 body: formData
             });
@@ -315,9 +315,12 @@
 
             const data = await response.json();
             
-            // Display results
             document.getElementById('batchResult').style.display = 'block';
-            document.getElementById('batchOutput').textContent = JSON.stringify(data, null, 2);
+            document.getElementById('batchOutput').innerHTML =
+            `Output file: <a href="${data.output_path}" target="_blank">Dowanlod file</a><br>
+            Latency: ${data.latency ?? 'N/A'} sec<br>
+            Predictions/sec: ${data.throughput ?? 'N/A'}`;
+
         } catch (error) {
             alert(error.message);
         }
