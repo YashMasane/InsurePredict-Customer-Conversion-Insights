@@ -11,6 +11,8 @@
 
 ---
 
+![demo image](img/demo.png)
+
 ## 🎯 Executive Summary
 
 **InsurePredict** transforms insurance sales strategy through intelligent customer targeting. Built on a comprehensive dataset of 381,109 customer records, our solution tackles the critical challenge of severe class imbalance (87.7% vs 12.3%) using advanced sampling techniques.
@@ -313,7 +315,7 @@ Our **Gradient Boosting Classifier** achieves exceptional performance with optim
 
 #### Model comparison
 
-![System Architecture](img/model_comparison.png)
+![Models Comparison](img/model_comparison.png)
 
 ### Why Gradient Boosting Classifier?
 
